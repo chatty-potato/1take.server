@@ -1,0 +1,22 @@
+plugins {
+    id 'java-test-fixtures'
+}
+
+dependencies {
+    // lombok
+    testFixturesCompileOnly 'org.projectlombok:lombok'
+    testFixturesAnnotationProcessor 'org.projectlombok:lombok'
+
+    // spring boot test
+    testFixturesImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testFixturesImplementation 'org.springframework.security:spring-security-test'
+
+    // junit
+    testFixturesImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+    testFixturesRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // testcontainers
+    testFixturesImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testFixturesImplementation 'org.testcontainers:junit-jupiter'
+    testFixturesImplementation 'org.testcontainers:postgresql'
+}

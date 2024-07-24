@@ -1,0 +1,46 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.1'
+    id 'io.spring.dependency-management' version '1.1.5'
+}
+
+allprojects {
+    group = 'chatty-potato'
+    version = '0.0.1'
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    apply from: "$rootDir/jacoco.gradle"
+    apply from: "$rootDir/checkstyle.gradle"
+    apply from: "$rootDir/dependencies.gradle"
+}
+
+bootJar.enabled = false
+
+project(':onetake') {
+    bootJar { enabled = true }  // main class
+    jar { enabled = true }
+    dependencies {
+        implementation project(':onetake-data')
+    }
+}
+
+project(':onetake-data') {
+    bootJar { enabled = false }
+    jar { enabled = true }
+    dependencies {}
+}
+
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
