@@ -4,42 +4,54 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.5'
 }
 
-allprojects {
-    group = 'chatty-potato'
-    version = '0.0.1'
-    java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(17)
-        }
-    }
-    repositories {
-        mavenCentral()
+apply from: "$rootDir/jacoco.gradle"
+apply from: "$rootDir/checkstyle.gradle"
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
     }
 }
 
-subprojects {
-    apply plugin: 'java'
-    apply plugin: 'org.springframework.boot'
-    apply plugin: 'io.spring.dependency-management'
-    apply from: "$rootDir/jacoco.gradle"
-    apply from: "$rootDir/checkstyle.gradle"
-    apply from: "$rootDir/dependencies.gradle"
-}
-
-bootJar.enabled = false
-
-project(':onetake') {
-    bootJar { enabled = true }  // main class
-    jar { enabled = true }
-    dependencies {
-        implementation project(':onetake-data')
+group = 'chatty-potato'
+version = '0.0.1'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
-project(':onetake-data') {
-    bootJar { enabled = false }
-    jar { enabled = true }
-    dependencies {}
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // spring boot
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // postgresql
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // spring boot test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // junit
+    testImplementation "org.junit.jupiter:junit-jupiter:5.8.1"
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // testcontainers
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:postgresql'
 }
 
 compileJava.options.encoding = 'UTF-8'
