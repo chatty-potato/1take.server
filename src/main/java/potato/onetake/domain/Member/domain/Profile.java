@@ -1,4 +1,4 @@
-package potato.onetake.Profile;
+package potato.onetake.domain.Member.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

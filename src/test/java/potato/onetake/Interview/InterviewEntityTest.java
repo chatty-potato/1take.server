@@ -1,4 +1,4 @@
-package potato.onetake.ineterview;
+package potato.onetake.Interview;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,7 +8,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import potato.onetake.Profile.Profile;
+import potato.onetake.domain.Member.domain.Profile;
+import potato.onetake.domain.Ineterview.Interview;
+import potato.onetake.domain.Ineterview.InterviewRepository;
 
 import static org.junit.jupiter.api.Assertions.*; // Assertions import
 import static org.mockito.Mockito.*; // Mockito methods import

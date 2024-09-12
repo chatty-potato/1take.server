@@ -1,4 +1,4 @@
-package potato.onetake.ineterview;
+package potato.onetake.domain.Ineterview;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
