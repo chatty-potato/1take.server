@@ -1,4 +1,4 @@
-package potato.onetake.domain.Ineterview;
+package potato.onetake.domain.Ineterview.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;

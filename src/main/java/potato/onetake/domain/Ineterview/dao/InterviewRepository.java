@@ -1,6 +1,7 @@
-package potato.onetake.domain.Ineterview;
+package potato.onetake.domain.Ineterview.dao;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import potato.onetake.domain.Ineterview.domain.Interview;
 
 import java.util.Optional;
 

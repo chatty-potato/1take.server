@@ -9,8 +9,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import potato.onetake.domain.Member.domain.Profile;
-import potato.onetake.domain.Ineterview.Interview;
-import potato.onetake.domain.Ineterview.InterviewRepository;
+import potato.onetake.domain.Ineterview.domain.Interview;
+import potato.onetake.domain.Ineterview.dao.InterviewRepository;
 
 import static org.junit.jupiter.api.Assertions.*; // Assertions import
 import static org.mockito.Mockito.*; // Mockito methods import
