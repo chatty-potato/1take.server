@@ -1,4 +1,9 @@
-import static org.junit.jupiter.api.Assertions.*;
-class OneTakeApplicationTest {
+package potato.onetake;
 
+import org.junit.jupiter.api.Test;
+
+class OneTakeApplicationTest {
+	@Test
+	void contextLoads() {
+	}
 }

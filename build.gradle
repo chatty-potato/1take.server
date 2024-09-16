@@ -38,21 +38,25 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     // postgresql
-    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.postgresql:postgresql:42.7.2'
 
     // spring boot test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.mockito:mockito-core:5.5.0'
 
     // junit
-    testImplementation "org.junit.jupiter:junit-jupiter:5.8.1"
+    testImplementation "org.junit.jupiter:junit-jupiter:5.10.0"
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // testcontainers
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:postgresql'
-}
 
+}
+test {
+    useJUnitPlatform() // JUnit 5 플랫폼 사용
+}
 compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
