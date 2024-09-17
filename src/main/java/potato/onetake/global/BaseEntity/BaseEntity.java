@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @EntityListeners(AuditingEntityListener.class)
@@ -17,10 +18,11 @@ public abstract class BaseEntity {
 	private Long id;
 
 	@CreatedDate
-	private Date createdDate;
+	@Column(updatable = false)
+	private LocalDateTime createdAt;
 
 	@LastModifiedDate
-	private Date lastModifiedDate;
+	private LocalDateTime updatedAt;
 
-	private Date deletedDate;
+	private LocalDateTime deletedAt;
 }
