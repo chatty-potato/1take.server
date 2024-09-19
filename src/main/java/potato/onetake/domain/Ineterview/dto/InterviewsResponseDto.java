@@ -7,7 +7,7 @@ import lombok.Setter;
 
 import java.util.List;
 
-public class InterviewListResponseDto {
+public class InterviewsResponseDto {
 	private List<InterviewSessionDto> interviewSessions;
 
 	@Getter
