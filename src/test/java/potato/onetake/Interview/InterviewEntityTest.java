@@ -8,7 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import potato.onetake.domain.Auth.domain.Profile;
+import potato.onetake.domain.Position.domain.Profile;
 import potato.onetake.domain.Ineterview.domain.Interview;
 import potato.onetake.domain.Ineterview.dao.InterviewRepository;
 
