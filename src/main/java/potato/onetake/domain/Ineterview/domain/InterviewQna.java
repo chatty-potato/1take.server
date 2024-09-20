@@ -25,12 +25,12 @@ public class InterviewQna extends BaseEntity {
 	@Column(name = "answer", nullable = true)
 	private String answer;
 
-	public InterviewQna(Interview interview, Question question) {
+	public InterviewQna(final Interview interview, final Question question) {
 		this.interview = interview;
 		this.question = question;
 	}
 
-	public  InterviewQna(Interview interview, Question question, String answer) {
+	public  InterviewQna(final Interview interview, final Question question, final String answer) {
 		this.interview = interview;
 		this.question = question;
 		this.answer = answer;
