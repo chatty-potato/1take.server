@@ -1,4 +1,4 @@
-package potato.onetake.domain.Member.domain;
+package potato.onetake.domain.Position.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

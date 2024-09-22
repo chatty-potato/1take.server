@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import potato.onetake.domain.Content.domain.Question;
-import potato.onetake.domain.Member.domain.Profile;
+import potato.onetake.domain.Position.domain.Profile;
 import potato.onetake.global.BaseEntity.BaseEntity;
 
 @Entity
