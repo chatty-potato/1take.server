@@ -7,6 +7,10 @@ import lombok.Setter;
 
 import java.util.List;
 
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
 public class InterviewQuestionResponseDto {
 	private boolean done;
 	private long currentQuestionIndex;
