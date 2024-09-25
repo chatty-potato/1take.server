@@ -12,8 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 @Setter
 public class InterviewQuestionResponseDto {
-	private boolean done;
-	private long currentQuestionIndex;
 	private List<QuestionDto> questions;
 
 	@Getter
@@ -23,5 +21,6 @@ public class InterviewQuestionResponseDto {
 	public static class QuestionDto {
 		private String question;
 		private Long questionIndex;
+		private String answer;
 	}
 }
