@@ -7,19 +7,22 @@ import lombok.Setter;
 
 import java.util.List;
 
-// 프롬프트 결과보고 일단 보류
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
 public class InterviewReportResponseDto {
 	private Long sessionID;
 	private String title;
 	private String date;
 	private Integer score;
-	private List<InterviewQNADto> interviewQNAs;
+	private List<InterviewQnaReportDto> interviewQNAs;
 
 	@Getter
 	@Setter
 	@AllArgsConstructor
 	@NoArgsConstructor
-	public static class InterviewQNADto {
+	public static class InterviewQnaReportDto {
 		private String question;
 		private Long questionIndex;
 		private String answer;
@@ -27,5 +30,11 @@ public class InterviewReportResponseDto {
 		private Integer accuracy;
 		private Integer logicalConsistency;
 		private Integer technicalDepth;
+
+		public InterviewQnaReportDto(String question, Long questionIndex, String answer){
+			this.question = question;
+			this.questionIndex = questionIndex;
+			this.answer = answer;
+		}
 	}
 }

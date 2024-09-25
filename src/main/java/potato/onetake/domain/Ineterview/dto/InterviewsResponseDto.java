@@ -7,6 +7,10 @@ import lombok.Setter;
 
 import java.util.List;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class InterviewsResponseDto {
 	private List<InterviewSessionDto> interviewSessions;
 
