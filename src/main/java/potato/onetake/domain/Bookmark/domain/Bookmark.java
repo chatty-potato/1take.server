@@ -7,8 +7,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import potato.onetake.domain.Ineterview.domain.InterviewQna;
-import potato.onetake.domain.Position.domain.Profile;
+import potato.onetake.domain.Member.domain.Profile;
+import potato.onetake.domain.Interview.domain.InterviewQna;
 import potato.onetake.global.BaseEntity.BaseEntity;
 
 @Entity

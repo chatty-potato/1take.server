@@ -1,4 +1,4 @@
-package potato.onetake.domain.Position.dao;
+package potato.onetake.domain.Member.dao;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -15,8 +15,8 @@ import potato.onetake.domain.Ineterview.domain.Interview;
 import potato.onetake.domain.Ineterview.domain.InterviewCategory;
 import potato.onetake.domain.Ineterview.domain.InterviewQna;
 import potato.onetake.domain.Ineterview.dto.*;
-import potato.onetake.domain.Position.dao.ProfileRepository;
-import potato.onetake.domain.Position.domain.Profile;
+import potato.onetake.domain.Member.dao.ProfileRepository;
+import potato.onetake.domain.Member.domain.Profile;
 
 import java.util.*;
 
