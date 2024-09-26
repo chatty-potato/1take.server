@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import potato.onetake.domain.Content.domain.Question;
+import potato.onetake.domain.Content.domain.QuestionCategory;
 import potato.onetake.global.BaseEntity.BaseEntity;
 
 @Entity
@@ -19,20 +20,20 @@ public class InterviewQna extends BaseEntity {
 	private Interview interview;
 
 	@ManyToOne()
-	@JoinColumn(name = "question_id", referencedColumnName = "id")
-	private Question question;
+	@JoinColumn(name = "question_category_id", referencedColumnName = "id")
+	private QuestionCategory questionCategory;
 
 	@Column(name = "answer", nullable = true)
 	private String answer;
 
-	public InterviewQna(final Interview interview, final Question question) {
+	public InterviewQna(final Interview interview, final QuestionCategory questionCategory) {
 		this.interview = interview;
-		this.question = question;
+		this.questionCategory = questionCategory;
 	}
 
-	public  InterviewQna(final Interview interview, final Question question, final String answer) {
+	public  InterviewQna(final Interview interview, final QuestionCategory questionCategory, final String answer) {
 		this.interview = interview;
-		this.question = question;
+		this.questionCategory = questionCategory;
 		this.answer = answer;
 	}
 }

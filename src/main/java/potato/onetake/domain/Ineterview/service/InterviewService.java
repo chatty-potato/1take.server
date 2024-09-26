@@ -6,8 +6,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import potato.onetake.domain.Content.dao.CategoryRepository;
-import potato.onetake.domain.Content.domain.Category;
+import potato.onetake.domain.Content.dao.QuestionCategoryRepository;
+\import potato.onetake.domain.Content.domain.Category;
 import potato.onetake.domain.Content.domain.Question;
+import potato.onetake.domain.Content.domain.QuestionCategory;
 import potato.onetake.domain.Ineterview.dao.InterviewCategoryRepository;
 import potato.onetake.domain.Ineterview.dao.InterviewQnaRepository;
 import potato.onetake.domain.Ineterview.dao.InterviewRepository;
@@ -19,6 +21,7 @@ import potato.onetake.domain.Position.dao.ProfileRepository;
 import potato.onetake.domain.Position.domain.Profile;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +33,7 @@ public class InterviewService {
 	private final CategoryRepository categoryRepository;
 	private final InterviewQnaRepository interviewQnaRepository;
 	private final InterviewCategoryRepository interviewCategoryRepository;
+	private final QuestionCategoryRepository questionCategoryRepository;
 
 	/**
 	 *
@@ -53,14 +57,33 @@ public class InterviewService {
 
 		interviewRepository.save(interview);
 
+		List<Long> categoryIdList = new ArrayList<Long>();
+
 		interviewBeginRequestDto.getCategories().stream()
 			.map(categoryName -> categoryRepository.findByContent(categoryName)
 				.orElseThrow()) // exception 구현 필요
-			.forEach(category -> createInterviewCategory(interview, category));
-//		createInterviewQna(interview); TODO: 인터뷰 카테고리에 맞는 질문 넣는 기능 추후 완성
+			.forEach(category -> {
+				createInterviewCategory(interview, category);
+				categoryIdList.add(category.getId());
+			});
+		createInterviewQna(interview, categoryIdList);
 		return new InterviewBeginResponseDto(interview.getId());
 	}
 
+	@Transactional
+	public void createInterviewQna(final Interview interview, final List<Long> categoryIdList) {
+		final Map<Long, Integer> categoryIdAndNumList = distributeQuestions(10, categoryIdList);
+		final List<QuestionCategory> questionCategoryList =
+			questionCategoryRepository.findRandByCategoryIdList(categoryIdAndNumList);
+
+		List<InterviewQna> interviewQnaList = new ArrayList<>();
+
+		for (QuestionCategory questionCategory : questionCategoryList) {
+			interviewQnaList.add(new InterviewQna(interview, questionCategory));
+		}
+
+		interviewQnaRepository.saveAll(interviewQnaList);
+	}
 
 	@Transactional
 	public void createInterviewCategory(final Interview interview, final Category category) {
@@ -94,7 +117,7 @@ public class InterviewService {
 		return interviewsResponseDto;
 	}
 
-	// current qid
+	// 추후 answer set하는 부분을 setter가 아닌 서비스 로직을 통하여 변경 가능하도록 변경 예정
 	// answer
 	@Transactional
 	public InterviewAnswerResponseDto getInterviewAnswer(InterviewAnswerRequestDto interviewAnswerRequestDto, Long interviewId){
@@ -166,25 +189,22 @@ public class InterviewService {
 	 * HashMap 형태로, <String, num>으로 카테고리, 개수 형태로 query 요청
 	 * @return
 	 */
-	public Map<String, Integer> distributeQuestions(int totalQuestionsCount, List<String> categories){
+	public Map<Long, Integer> distributeQuestions(int totalQuestionsCount, List<Long> categories){
 		// redis에서 totalQuestionsCount를 보관하면 성능도 좋을듯
 		int categoriesCount = categories.size();
 
 		// TODO: if (num of question > num of category) 일 경우 exception 필요
 
-		Map<String, Integer> questionsMap = new HashMap<>();
+		Map<Long, Integer> questionsMap = new HashMap<>();
 
-		int minQuestionsPerCategory = categoriesCount / totalQuestionsCount;
-		int remainQuestionsPerCategory = categoriesCount % totalQuestionsCount;
+		int remainQuestionsPerCategory = totalQuestionsCount - categoriesCount;
 
-		for (String category : categories) {
-			questionsMap.put(category, minQuestionsPerCategory);
+		for (Long category : categories) {
+			questionsMap.put(category, 1);
 		}
 
-		Random random = new Random();
-
 		for (int i = 0; i < remainQuestionsPerCategory; i++) {
-			String randomCategory = categories.get(random.nextInt(categoriesCount));
+			Long randomCategory = categories.get(ThreadLocalRandom.current().nextInt());
 			questionsMap.put(randomCategory, questionsMap.get(randomCategory) + 1);
 		}
 
