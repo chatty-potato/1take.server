@@ -76,9 +76,13 @@ public class InterviewService {
 		final List<QuestionCategory> questionCategoryList =
 			questionCategoryRepository.findRandByCategoryIdList(categoryIdAndNumList);
 
+		List<InterviewQna> interviewQnas = new ArrayList<>();
+
 		for (QuestionCategory questionCategory : questionCategoryList) {
-			interviewQnaRepository.save(new InterviewQna(interview, questionCategory));
+			interviewQnas.add(new InterviewQna(interview, questionCategory));
 		}
+
+		interviewQnaRepository.saveAll(interviewQnas);
 	}
 
 	@Transactional
