@@ -1,0 +1,60 @@
+application.yml
+application.properties
+
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+gg-pingpong-api/src/main/resources/application.yml
+.DS_Store
+python
+**/logs
+**/src/main/generated/
+
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+*.log
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+**/generated
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### pem key ###
+42gg.pem
+pingping.pem
+
+###  logs  ###
+**/logs/*
+
+### git commit message convention file ###
+.gitmessage.txt
+
+**/generated
