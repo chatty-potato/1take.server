@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import potato.onetake.domain.Content.dao.CategoryRepository;
 import potato.onetake.domain.Content.dao.QuestionCategoryRepository;
-\import potato.onetake.domain.Content.domain.Category;
+import potato.onetake.domain.Content.domain.Category;
 import potato.onetake.domain.Content.domain.Question;
 import potato.onetake.domain.Content.domain.QuestionCategory;
 import potato.onetake.domain.Ineterview.dao.InterviewCategoryRepository;
