@@ -1,4 +1,4 @@
-package potato.onetake.domain.Auth.service;
+package potato.onetake.domain.auth.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
