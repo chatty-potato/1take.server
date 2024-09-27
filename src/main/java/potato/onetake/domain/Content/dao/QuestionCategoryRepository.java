@@ -5,5 +5,6 @@ import org.springframework.stereotype.Repository;
 import potato.onetake.domain.Content.domain.QuestionCategory;
 
 @Repository
-public interface QuestionCategoryRepository extends JpaRepository<QuestionCategory, Long> {
+public interface QuestionCategoryRepository extends JpaRepository<QuestionCategory, Long>, QuestionCategoryRepositoryCustom {
+
 }
