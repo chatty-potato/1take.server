@@ -159,7 +159,7 @@ public class InterviewService {
 			reportDto.setTitle(interviewEntity.getTitle());
 			List<InterviewReportResponseDto.InterviewQnaReportDto> qnaReport = qnaList.stream().map(
 				interviewQna -> {
-					Question question = interviewQna.getQuestion();
+					Question question = interviewQna.getQuestionCategory().getQuestion();
 					String questionContent = question.getContent();
 					String answer = interviewQna.getAnswer(); // TODO: answer이 없을 경우, 예외 필요
 					// TODO: 레포트 생성하는 부분 처리 필요
