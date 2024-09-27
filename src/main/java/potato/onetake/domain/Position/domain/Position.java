@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import potato.onetake.domain.Content.domain.Category;
+import potato.onetake.domain.Position.domain.Profile;
 import potato.onetake.global.BaseEntity.BaseEntity;
 
 @Entity
