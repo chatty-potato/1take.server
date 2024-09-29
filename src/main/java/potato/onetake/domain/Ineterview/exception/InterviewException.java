@@ -34,4 +34,8 @@ public class InterviewException extends CustomException {
 		public QuestionNotFoundException() { super(InterviewErrorCode.QUESTION_NOT_FOUND); }
 	}
 
+	public static class AnswerNotFoundException extends InterviewException {
+		public AnswerNotFoundException() { super(InterviewErrorCode.ANSWER_NOT_FOUND); }
+	}
+
 }
