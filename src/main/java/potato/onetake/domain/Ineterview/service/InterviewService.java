@@ -213,7 +213,7 @@ public class InterviewService {
 	}
 
 	@Transactional
-	public InterviewReportResponseDto createInterviewReport(InterviewReportCreateRequestDto interviewReportCreateRequestDto) {
+	public InterviewReportResponseDto createInterviewReport(Long interviewId) {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		long userId;
@@ -224,10 +224,8 @@ public class InterviewService {
 			throw new InterviewException.ProfileNotFoundException(); // userId를 찾지 못했을 때 예외 발생
 		}
 
-		Long interviewId = interviewReportCreateRequestDto.getSessionID();
 		Optional<Interview> interview = Optional.ofNullable(interviewRepository.findById(interviewId)
 			.orElseThrow(InterviewException.InterviewNotFoundException::new));
-		InterviewReportResponseDto interviewReportResponseDto = new InterviewReportResponseDto();
 		if (interview.isPresent()) {
 
 			Interview interviewEntity = interview.get();
