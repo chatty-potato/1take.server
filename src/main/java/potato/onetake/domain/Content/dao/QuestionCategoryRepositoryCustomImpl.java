@@ -5,6 +5,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import potato.onetake.domain.Content.domain.QuestionCategory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +24,7 @@ public class QuestionCategoryRepositoryCustomImpl implements QuestionCategoryRep
 			if (!first) {
 				sb.append(" UNION ALL ");
 			}
-			sb.append("(select * from question_category WHERE category_id =")
+			sb.append("(select * from question_category qc WHERE qc.category_id =")
 				.append(entry.getKey())
 				.append(" ORDER BY RANDOM() LIMIT ")
 				.append(entry.getValue())
@@ -31,7 +32,7 @@ public class QuestionCategoryRepositoryCustomImpl implements QuestionCategoryRep
 			first = false;
 		}
 
-		Query query = em.createNativeQuery(sb.toString());
+		Query query = em.createNativeQuery(sb.toString(), QuestionCategory.class);
 
 		return (List<QuestionCategory>) query.getResultList();
 	}

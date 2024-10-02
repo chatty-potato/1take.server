@@ -1,7 +1,7 @@
 package potato.onetake.domain.Ineterview.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -28,6 +28,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class InterviewService {
 
 	private final InterviewRepository interviewRepository;
@@ -102,18 +103,17 @@ public class InterviewService {
 	@Transactional
 	public void createInterviewQna(final Interview interview, final List<Long> categoryIdList) {
 		final Map<Long, Integer> categoryIdAndNumList = distributeQuestions(10, categoryIdList);
-		final List<QuestionCategory> questionCategoryList =
+		final List<QuestionCategory> questionCategoryResultList =
 			questionCategoryRepository.findRandByCategoryIdList(categoryIdAndNumList);
 
-		if (questionCategoryList.isEmpty() || questionCategoryList.size() < 10) {
+		if (questionCategoryResultList.isEmpty() || questionCategoryResultList.size() < 10) {
 			throw new InterviewException.InvalidCategoryException();
 		} // 완성된 qna 수가 10개 미만이거나 비었을 경우 exception 던짐
 
 		List<InterviewQna> interviewQnaList = new ArrayList<>();
 
-		for (QuestionCategory questionCategory : questionCategoryList) {
-			interviewQnaList.add(new InterviewQna(interview, questionCategory));
-		}
+		questionCategoryResultList.forEach(questionCategory ->
+			interviewQnaList.add(new InterviewQna(interview, questionCategory)));
 
 		interviewQnaRepository.saveAll(interviewQnaList);
 	}
@@ -151,7 +151,7 @@ public class InterviewService {
 		final Profile profile = profileRepository.findById(userId)
 			.orElseThrow(InterviewException.ProfileNotFoundException::new);
 
-		Optional<List<Interview>> interviews = interviewRepository.findAllByProfileId(userId);
+		Optional<List<Interview>> interviews = interviewRepository.findAllByProfileId(profile.getId());
 
 		InterviewsResponseDto interviewsResponseDto = new InterviewsResponseDto();
 
@@ -193,7 +193,8 @@ public class InterviewService {
 
 		if (interview.isPresent()) {
 			Interview interviewEntity = interview.get();
-			Optional<InterviewQna> interviewQna = Optional.ofNullable(interviewQnaRepository.findByInterviewIdAndQuestionId(
+			Optional<InterviewQna> interviewQna = Optional.ofNullable(interviewQnaRepository
+				.findByInterviewIdAndQuestionCategoryId(
 					interviewId, interviewAnswerRequestDto.getQuestionIndex())
 				.orElseThrow(InterviewException.QuestionNotFoundException::new));
 			interviewQna.ifPresent(qna -> {
@@ -297,7 +298,7 @@ public class InterviewService {
 
 		// 남은 질문을 랜덤하게 카테고리에 할당합니다.
 		for (int i = 0; i < remainQuestionsPerCategory; i++) {
-			Long randomCategory = categories.get(ThreadLocalRandom.current().nextInt());
+			Long randomCategory = categories.get(ThreadLocalRandom.current().nextInt(categories.size()));
 			questionsMap.put(randomCategory, questionsMap.get(randomCategory) + 1);
 		}
 
