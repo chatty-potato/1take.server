@@ -24,7 +24,7 @@ public class QuestionCategoryRepositoryCustomImpl implements QuestionCategoryRep
 			if (!first) {
 				sb.append(" UNION ALL ");
 			}
-			sb.append("(select * from question_category qc WHERE qc.category_id =")
+			sb.append("(select * from question_category WHERE category_id =")
 				.append(entry.getKey())
 				.append(" ORDER BY RANDOM() LIMIT ")
 				.append(entry.getValue())
