@@ -59,6 +59,7 @@ public class InterviewServiceTest {
 	}
 
 	// profile 모킹, test category, question 설정
+	// Given
 	@BeforeEach
 	public void setUp() {
 		Authentication authentication = new UsernamePasswordAuthenticationToken(
@@ -99,10 +100,10 @@ public class InterviewServiceTest {
 		//Given
 		InterviewBeginRequestDto interviewBeginRequestDto =
 			new InterviewBeginRequestDto("test title", Arrays.asList("Test Category 1", "Test Category 2", "Test Category 3"));
-
+		//When
 		InterviewBeginResponseDto interviewBeginResponseDto =
 			interviewService.createInterview(interviewBeginRequestDto);
-
+		//Then
 		Assertions.assertNotNull(interviewBeginResponseDto.getSessionID());
 
 		Assertions.assertTrue(interviewRepository.findById(interviewBeginResponseDto.getSessionID()).isPresent());
@@ -110,8 +111,9 @@ public class InterviewServiceTest {
 
 	@Test
 	public void getInterviewTest() {
+		//When
 		InterviewsResponseDto interviewsResponseDto = interviewService.getInterviews();
-
+		//Then
 		Assertions.assertNotNull(interviewsResponseDto.getInterviewSessions());
 
 		Assertions.assertTrue(interviewsResponseDto.getInterviewSessions().isEmpty());
