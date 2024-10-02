@@ -1,4 +1,4 @@
-package potato.onetake.domain.auth.provider;
+package potato.onetake.infrastructure.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

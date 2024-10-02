@@ -1,4 +1,4 @@
-package potato.onetake.domain.auth.service;
+package potato.onetake.infrastructure.auth;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,4 +32,5 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
 				attributes
 		);
 	}
+
 }

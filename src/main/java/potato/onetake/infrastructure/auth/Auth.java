@@ -1,4 +1,4 @@
-package potato.onetake.domain.auth.domain;
+package potato.onetake.infrastructure.auth;
 
 import jakarta.persistence.*;
 import lombok.Getter;

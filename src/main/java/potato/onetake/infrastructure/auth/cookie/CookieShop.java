@@ -1,4 +1,4 @@
-package potato.onetake.domain.auth.cookie;
+package potato.onetake.infrastructure.auth.cookie;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
