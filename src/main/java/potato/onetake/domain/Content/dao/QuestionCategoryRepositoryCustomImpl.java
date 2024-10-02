@@ -5,6 +5,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import potato.onetake.domain.Content.domain.QuestionCategory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +32,7 @@ public class QuestionCategoryRepositoryCustomImpl implements QuestionCategoryRep
 			first = false;
 		}
 
-		Query query = em.createNativeQuery(sb.toString());
+		Query query = em.createNativeQuery(sb.toString(), QuestionCategory.class);
 
 		return (List<QuestionCategory>) query.getResultList();
 	}

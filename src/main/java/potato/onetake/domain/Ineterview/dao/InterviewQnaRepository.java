@@ -9,9 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface InterviewQnaRepository extends JpaRepository<InterviewQna, Long> {
-	Optional<InterviewQna> findByInterviewIdAndQuestionId(Long interviewId, Long questionId);
+	Optional<InterviewQna> findByInterviewIdAndQuestionCategoryId(Long interviewId, Long questionCategoryId);
 
 	List<InterviewQna> findAllByInterviewId(Long interviewId);
-
-	Optional<Long> findQuestionIdByInterviewId(Long interviewId);
 }
