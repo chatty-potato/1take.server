@@ -213,7 +213,7 @@ public class InterviewService {
 	}
 
 	@Transactional
-	public InterviewQuestionResponseDto getInterviewQuestions(Long interviewId) {
+	public InterviewQuestionResponseDto findAllInterviewQnas(Long interviewId) {
 		List<InterviewQna> interviewQnaList = interviewQnaRepository.findAllByInterviewId(interviewId);
 		InterviewQuestionResponseDto interviewQuestionResponseDto = new InterviewQuestionResponseDto();
 		interviewQnaList.forEach(qna -> {
