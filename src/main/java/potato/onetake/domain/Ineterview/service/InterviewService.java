@@ -230,7 +230,7 @@ public class InterviewService {
 
 
 	@Transactional
-	public InterviewReportResponseDto createInterviewReport(InterviewReportCreateRequestDto interviewReportCreateRequestDto) {
+	public InterviewReportResponseDto createInterviewReport(Long interviewId) {
 
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

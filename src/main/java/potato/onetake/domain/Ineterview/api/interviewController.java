@@ -27,7 +27,8 @@ public class interviewController {
 
 	@GetMapping("/{sessionID}/questions")
 	public ResponseEntity<InterviewQuestionResponseDto> findAllQnaBySessionID(@PathVariable String sessionID) {
-		InterviewQuestionResponseDto interviewQuestion = null;
+		Long interviewId = Long.parseLong(sessionID);
+		InterviewQuestionResponseDto interviewQuestion = interviewService.findAllInterviewQnas(interviewId);
 		return ResponseEntity.ok(interviewQuestion);
 	}
 
