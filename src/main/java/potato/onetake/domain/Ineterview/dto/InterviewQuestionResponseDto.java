@@ -1,9 +1,6 @@
 package potato.onetake.domain.Ineterview.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -11,13 +8,19 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
+@Builder
 public class InterviewQuestionResponseDto {
 	private List<QuestionDto> questions;
+
+	public void addQuestion(QuestionDto question) {
+		questions.add(question);
+	}
 
 	@Getter
 	@Setter
 	@AllArgsConstructor
 	@NoArgsConstructor
+	@Builder
 	public static class QuestionDto {
 		private String question;
 		private Long questionIndex;

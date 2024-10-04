@@ -213,7 +213,25 @@ public class InterviewService {
 	}
 
 	@Transactional
-	public InterviewReportResponseDto createInterviewReport(Long interviewId) {
+	public InterviewQuestionResponseDto findAllInterviewQnas(Long interviewId) {
+		List<InterviewQna> interviewQnaList = interviewQnaRepository.findAllByInterviewId(interviewId);
+		InterviewQuestionResponseDto interviewQuestionResponseDto = new InterviewQuestionResponseDto();
+		interviewQnaList.forEach(qna -> {
+			InterviewQuestionResponseDto.QuestionDto questionDto =
+				InterviewQuestionResponseDto.QuestionDto.builder()
+					.questionIndex(qna.getId())
+					.question(qna.getQuestionCategory().getQuestion().getContent())
+					.answer(qna.getAnswer())
+					.build();
+			interviewQuestionResponseDto.addQuestion(questionDto);
+		});
+		return interviewQuestionResponseDto;
+	}
+
+
+	@Transactional
+	public InterviewReportResponseDto createInterviewReport(InterviewReportCreateRequestDto interviewReportCreateRequestDto) {
+
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		long userId;
