@@ -215,6 +215,9 @@ public class InterviewService {
 	@Transactional
 	public InterviewQuestionResponseDto findAllInterviewQnas(Long interviewId) {
 		List<InterviewQna> interviewQnaList = interviewQnaRepository.findAllByInterviewId(interviewId);
+		if (interviewQnaList.isEmpty() || interviewQnaList.size() < 10) {
+			throw new InterviewException.QuestionNotFoundException();
+		}
 		InterviewQuestionResponseDto interviewQuestionResponseDto = new InterviewQuestionResponseDto();
 		interviewQnaList.forEach(qna -> {
 			InterviewQuestionResponseDto.QuestionDto questionDto =
