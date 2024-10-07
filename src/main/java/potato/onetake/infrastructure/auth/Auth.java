@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import potato.onetake.domain.member.domain.Member;
 
 @Getter
 @Setter
@@ -22,13 +23,16 @@ public class Auth {
 	@Column(name = "provider_id", length = 50, nullable = false)
 	private String providerId;
 
-//	@todo Member Entity 추가 후 주석 해제
-//	@ManyToOne
-//	@JoinColumn(name = "member_id")
-//	private Member member;
+	@Column(name = "uuid", length = 50, nullable = false)
+	private String uuid;
 
-	public Auth(String provider, String providerId) {
+	@ManyToOne
+	@JoinColumn(name = "member_id")
+	private Member member;
+
+	public Auth(String provider, String providerId, String uuid) {
 		this.provider = provider;
 		this.providerId = providerId;
+		this.uuid = uuid;
 	}
 }

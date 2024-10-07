@@ -1,6 +1,7 @@
 package potato.onetake.infrastructure.auth.cookie;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class CookieShop {
@@ -14,6 +15,7 @@ public class CookieShop {
 	 *  response.addCookie(cookie) HttpServletResponse객체에 추가 후 클라이언트 전송
 	 * */
 	public static void bakedCookie(
+		final HttpServletRequest request,
 		final HttpServletResponse response,
 		final String key,
 		final int expiry,
@@ -21,11 +23,18 @@ public class CookieShop {
 		final boolean http) {
 		final Cookie cookie = new Cookie(key, token);
 
+		// 요청 도메인을 기반으로 도메인 설정 (localhost가 아닌 실제 도메인 적용)
+		// String domain = request.getServerName();
+		// cookie.setDomain(domain);
+
 		cookie.setDomain("localhost");
+
 		cookie.setPath("/");
 		cookie.setMaxAge(expiry);
 		cookie.setHttpOnly(http);
-		cookie.setSecure(true);
+
+		// 요청이 HTTPS인 경우에만 Secure 속성 적용
+		cookie.setSecure(request.isSecure());
 
 		response.addCookie(cookie);
 	}
