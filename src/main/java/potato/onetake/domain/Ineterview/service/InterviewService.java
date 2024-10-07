@@ -216,6 +216,19 @@ public class InterviewService {
 		return new InterviewAnswerResponseDto(allAnswered);
 	}
 
+	/**
+	 * findAllInterviewQnas 메서드
+ 	* 인터뷰 ID에 해당하는 모든 질문과 그 답변을 조회합니다.
+ 	*
+ 	* @param interviewId 인터뷰 세션 ID
+ 	*
+ 	* 처리 단계:
+ 	* 1. 인터뷰 ID에 해당하는 모든 질문 목록을 조회합니다.
+ 	* 2. 만약 질문이 없거나, 질문 수가 10개 미만일 경우 예외를 던집니다.
+ 	* 3. 각 질문과 해당 답변을 DTO로 변환하여 응답 객체에 추가합니다.
+ 	*
+ 	* @return InterviewQuestionResponseDto - 질문과 답변 목록을 포함한 응답 DTO
+ 	*/
 	@Transactional
 	public InterviewQuestionResponseDto findAllInterviewQnas(Long interviewId) {
 		List<InterviewQna> interviewQnaList = interviewQnaRepository.findAllByInterviewId(interviewId);
