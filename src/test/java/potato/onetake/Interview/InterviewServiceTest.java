@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.context.SecurityContextHolder;
 import potato.onetake.domain.Content.dao.CategoryRepository;
 import potato.onetake.domain.Content.dao.QuestionCategoryRepository;
 import potato.onetake.domain.Content.dao.QuestionRepository;
@@ -19,10 +20,14 @@ import potato.onetake.domain.Ineterview.dto.*;
 import potato.onetake.domain.Ineterview.service.InterviewService;
 import potato.onetake.domain.Position.dao.ProfileRepository;
 import potato.onetake.domain.Position.domain.Profile;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.*;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,6 +43,20 @@ public class InterviewServiceTest {
 	@Mock private QuestionCategoryRepository questionCategoryRepository;
 
 	@InjectMocks private InterviewService interviewService;
+
+	@BeforeEach
+	public void setup() {
+		// Create a mock authentication object
+		Authentication authentication = mock(Authentication.class);
+		when(authentication.getName()).thenReturn("testUser");
+
+		// Create a mock SecurityContext and set the authentication object
+		SecurityContext securityContext = mock(SecurityContext.class);
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+
+		// Set the mock SecurityContext in the SecurityContextHolder
+		SecurityContextHolder.setContext(securityContext);
+	}
 
 	@Test
 	@DisplayName("인터뷰 생성 테스트")
@@ -93,11 +112,18 @@ public class InterviewServiceTest {
 	public void getInterviewTest() {
 		// Given
 		Profile profile = new Profile("Test Profile");
-		when(profileRepository.save(any(Profile.class))).thenReturn(profile);
 
-		for (int i = 0; i < 5; i++)
-			when(interviewRepository.save(any(Interview.class)))
-				.thenReturn(new Interview(profile, "test interview " + i));
+		// Mock ProfileRepository가 Profile 객체를 반환하도록 설정
+		when(profileRepository.findById(anyLong())).thenReturn(Optional.of(profile));
+
+		// 인터뷰 Mock 데이터 설정
+		List<Interview> mockInterviews = new ArrayList<>();
+		for (int i = 0; i < 5; i++) {
+			Interview interview = new Interview(profile, "test interview " + i);
+			mockInterviews.add(interview);
+		}
+
+		when(interviewRepository.findAllByProfileId(anyLong())).thenReturn(Optional.of(mockInterviews));
 
 		// Expected
 		InterviewsResponseDto expectedResult = new InterviewsResponseDto();
