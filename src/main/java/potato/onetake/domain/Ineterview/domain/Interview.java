@@ -7,6 +7,8 @@ import lombok.Setter;
 import potato.onetake.domain.Position.domain.Profile;
 import potato.onetake.global.BaseEntity.BaseEntity;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter

@@ -59,14 +59,14 @@ public class InterviewService {
 	public InterviewBeginResponseDto createInterview(final InterviewBeginRequestDto interviewBeginRequestDto) {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		long userId;
+		String userId;
 		try {
-			userId = Long.parseLong(authentication.getName()); // 추후 시큐리티 완성 후 맞게 수정 필요
+			userId = authentication.getName(); // 추후 시큐리티 완성 후 맞게 수정 필요
 		} catch (NumberFormatException e) {
 			throw new InterviewException.ProfileNotFoundException(); // userId를 찾지 못했을 때 예외 발생
 		}
 
-		final Profile profile = profileRepository.findById(userId)
+		final Profile profile = profileRepository.findByAlias(userId)
 			.orElseThrow(InterviewException.ProfileNotFoundException::new);
 
 		Interview interview = new Interview(profile, interviewBeginRequestDto.getTitle());
@@ -81,7 +81,8 @@ public class InterviewService {
 				categoryIdList.add(category.getId());
 			});
 
-		createInterviewQna(interview, categoryIdList);
+		Map<Long, Integer> categoryIdAndNumList = distributeQuestions(10, categoryIdList);
+		createInterviewQna(interview, categoryIdAndNumList);
 		return new InterviewBeginResponseDto(interview.getId());
 	}
 
@@ -90,7 +91,7 @@ public class InterviewService {
 	 * 인터뷰에 질문을 분배하고, 각 질문에 대한 InterviewQna를 생성합니다.
 	 *
 	 * @param interview 생성된 인터뷰 객체
-	 * @param categoryIdList 선택된 카테고리의 ID 리스트
+	 * @param categoryIdAndNumList 선택된 카테고리의 ID와 카테고리 별 질문 개수 리스트
 	 *
 	 * 처리 단계:
 	 * 1. 각 카테고리에 대해 분배할 질문 수를 계산합니다.
@@ -101,8 +102,8 @@ public class InterviewService {
 	 *  - 질문 목록이 비어있거나, 질문 개수가 부족할 경우 InvalidCategoryException 예외 발생
 	 */
 	@Transactional
-	public void createInterviewQna(final Interview interview, final List<Long> categoryIdList) {
-		final Map<Long, Integer> categoryIdAndNumList = distributeQuestions(10, categoryIdList);
+	public List<InterviewQna> createInterviewQna(final Interview interview,
+												 final Map<Long, Integer> categoryIdAndNumList) {
 		final List<QuestionCategory> questionCategoryResultList =
 			questionCategoryRepository.findRandByCategoryIdList(categoryIdAndNumList);
 
@@ -116,12 +117,15 @@ public class InterviewService {
 			interviewQnaList.add(new InterviewQna(interview, questionCategory)));
 
 		interviewQnaRepository.saveAll(interviewQnaList);
+
+		return interviewQnaList;
 	}
 
 	@Transactional
-	public void createInterviewCategory(final Interview interview, final Category category) {
+	public InterviewCategory createInterviewCategory(final Interview interview, final Category category) {
 		InterviewCategory interviewCategory = new InterviewCategory(interview, category);
 		interviewCategoryRepository.save(interviewCategory);
+		return interviewCategory;
 	}
 
 	/**
@@ -140,18 +144,17 @@ public class InterviewService {
 	public InterviewsResponseDto getInterviews() {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		long userId;
-
+		String userId;
 		try {
-			userId = Long.parseLong(authentication.getName()); // 추후 시큐리티 완성 후 맞게 수정 필요
+			userId = authentication.getName(); // 추후 시큐리티 완성 후 맞게 수정 필요
 		} catch (NumberFormatException e) {
 			throw new InterviewException.ProfileNotFoundException(); // userId를 찾지 못했을 때 예외 발생
 		}
 
-		final Profile profile = profileRepository.findById(userId)
+		final Profile profile = profileRepository.findByAlias(userId)
 			.orElseThrow(InterviewException.ProfileNotFoundException::new);
 
-		Optional<List<Interview>> interviews = interviewRepository.findAllByProfileId(profile.getId());
+		Optional<List<Interview>> interviews = interviewRepository.findAllByProfileAlias(profile.getAlias());
 
 		InterviewsResponseDto interviewsResponseDto = new InterviewsResponseDto();
 
@@ -161,7 +164,7 @@ public class InterviewService {
 				.map(interview -> new InterviewsResponseDto.InterviewSessionDto(
 					interview.getId(),
 					interview.getTitle(),
-					interview.getCreatedAt().toString(),
+					interview.getCreatedAt() != null ? interview.getCreatedAt().toString() : "No Creation Date",
 					0,
 					interview.isDone()
 				)).toList();
