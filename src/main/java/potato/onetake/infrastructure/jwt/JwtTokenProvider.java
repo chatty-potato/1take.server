@@ -1,5 +1,14 @@
 package potato.onetake.infrastructure.jwt;
 
+import java.security.Key;
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -9,15 +18,6 @@ import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.stereotype.Component;
-
-import java.security.Key;
-import java.util.Date;
 
 @Slf4j
 @Getter
@@ -34,9 +34,7 @@ public class JwtTokenProvider {
 	// 7일 -> 밀리초로 변환
 	private static final long refreshTokenValidity = 1000L * 60L * 60L * 24L * 7L; // 7일
 
-
-	private final UserDetailsService userDetailsService;
-
+	private final CustomUserDetailsService customUserDetailsService;
 
 	public String createAccessToken(String uuid) {
 		Claims claims = Jwts.claims().setSubject(uuid);
@@ -52,7 +50,6 @@ public class JwtTokenProvider {
 			.compact();
 	}
 
-
 	public String createRefreshToken(String uuid) {
 		Claims claims = Jwts.claims().setSubject(uuid);
 
@@ -67,6 +64,13 @@ public class JwtTokenProvider {
 			.compact();
 	}
 
+	// JWT에서 사용자 정보 추출
+	public Authentication getAuthentication(String token) {
+		String uuid = getUuidFromToken(token);
+		UserDetails userDetails = customUserDetailsService.loadUserByUsername(uuid);
+		return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+	}
+
 	// JWT에서 UUID 추출
 	public String getUuidFromToken(String token) {
 		return Jwts.parserBuilder()
@@ -75,13 +79,6 @@ public class JwtTokenProvider {
 			.parseClaimsJws(token)
 			.getBody()
 			.getSubject();
-	}
-
-	// 토큰에서 인증 정보 추출
-	public Authentication getAuthentication(String token) {
-		String uuid = getUuidFromToken(token);
-		UserDetails userDetails = userDetailsService.loadUserByUsername(uuid);
-		return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
 	}
 
 	public boolean validateToken(String token) {
