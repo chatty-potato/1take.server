@@ -59,14 +59,14 @@ public class InterviewService {
 	public InterviewBeginResponseDto createInterview(final InterviewBeginRequestDto interviewBeginRequestDto) {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		long userId;
+		String userId;
 		try {
-			userId = Long.parseLong(authentication.getName()); // 추후 시큐리티 완성 후 맞게 수정 필요
+			userId = authentication.getName(); // 추후 시큐리티 완성 후 맞게 수정 필요
 		} catch (NumberFormatException e) {
 			throw new InterviewException.ProfileNotFoundException(); // userId를 찾지 못했을 때 예외 발생
 		}
 
-		final Profile profile = profileRepository.findById(userId)
+		final Profile profile = profileRepository.findByAlias(userId)
 			.orElseThrow(InterviewException.ProfileNotFoundException::new);
 
 		Interview interview = new Interview(profile, interviewBeginRequestDto.getTitle());
@@ -144,18 +144,17 @@ public class InterviewService {
 	public InterviewsResponseDto getInterviews() {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		long userId;
-
+		String userId;
 		try {
-			userId = Long.parseLong(authentication.getName()); // 추후 시큐리티 완성 후 맞게 수정 필요
+			userId = authentication.getName(); // 추후 시큐리티 완성 후 맞게 수정 필요
 		} catch (NumberFormatException e) {
 			throw new InterviewException.ProfileNotFoundException(); // userId를 찾지 못했을 때 예외 발생
 		}
 
-		final Profile profile = profileRepository.findById(userId)
+		final Profile profile = profileRepository.findByAlias(userId)
 			.orElseThrow(InterviewException.ProfileNotFoundException::new);
 
-		Optional<List<Interview>> interviews = interviewRepository.findAllByProfileId(profile.getId());
+		Optional<List<Interview>> interviews = interviewRepository.findAllByProfileAlias(profile.getAlias());
 
 		InterviewsResponseDto interviewsResponseDto = new InterviewsResponseDto();
 
@@ -165,7 +164,7 @@ public class InterviewService {
 				.map(interview -> new InterviewsResponseDto.InterviewSessionDto(
 					interview.getId(),
 					interview.getTitle(),
-					interview.getCreatedAt().toString(),
+					interview.getCreatedAt() != null ? interview.getCreatedAt().toString() : "No Creation Date",
 					0,
 					interview.isDone()
 				)).toList();

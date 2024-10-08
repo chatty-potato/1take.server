@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.annotation.Rollback;
 import potato.onetake.domain.Content.dao.CategoryRepository;
 import potato.onetake.domain.Content.dao.QuestionCategoryRepository;
 import potato.onetake.domain.Content.dao.QuestionRepository;
@@ -22,8 +23,8 @@ import potato.onetake.domain.Position.dao.ProfileRepository;
 import potato.onetake.domain.Position.domain.Profile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -68,6 +69,7 @@ public class InterviewServiceTest {
 				Arrays.asList("Test Category 1", "Test Category 2", "Test Category 3"));
 
 		// Expected
+
 		InterviewBeginResponseDto expectedResult = new InterviewBeginResponseDto(1L);
 		when(interviewService.createInterview(interviewBeginRequestDto)).thenReturn(expectedResult);
 
@@ -111,35 +113,57 @@ public class InterviewServiceTest {
 	@DisplayName("인터뷰 전체 조회")
 	public void getInterviewTest() {
 		// Given
-		Profile profile = new Profile("Test Profile");
+		Profile profile = new Profile("testUser");
 
 		// Mock ProfileRepository가 Profile 객체를 반환하도록 설정
-		when(profileRepository.findById(anyLong())).thenReturn(Optional.of(profile));
+		when(profileRepository.findByAlias(anyString())).thenReturn(Optional.of(profile));
 
 		// 인터뷰 Mock 데이터 설정
 		List<Interview> mockInterviews = new ArrayList<>();
-		for (int i = 0; i < 5; i++) {
+		List<InterviewsResponseDto.InterviewSessionDto> interviewSessionDtosList = new ArrayList<>();
+ 		for (int i = 0; i < 5; i++) {
 			Interview interview = new Interview(profile, "test interview " + i);
+			InterviewsResponseDto.InterviewSessionDto interviewSessionDto =
+				new InterviewsResponseDto.InterviewSessionDto(
+					interview.getId(),
+					interview.getTitle(),
+					interview.getCreatedAt() != null ? interview.getCreatedAt().toString() : "No Creation Date",
+					0,
+					interview.isDone()
+				);
+			interviewSessionDtosList.add(interviewSessionDto);
 			mockInterviews.add(interview);
 		}
 
-		when(interviewRepository.findAllByProfileId(anyLong())).thenReturn(Optional.of(mockInterviews));
+		// findAllByProfileAlias()가 Optional<List<Interview>>를 반환하도록 설정
+		when(interviewRepository.findAllByProfileAlias(anyString())).thenReturn(Optional.of(mockInterviews));
 
-		// Expected
+		// Expected 인터뷰 세션 초기화
 		InterviewsResponseDto expectedResult = new InterviewsResponseDto();
-		when(interviewService.getInterviews()).thenReturn(expectedResult);
+
+		expectedResult.setInterviewSessions(interviewSessionDtosList); // 빈 리스트로 초기화
 
 		// When
 		InterviewsResponseDto interviewsResponseDto = interviewService.getInterviews();
 
 		// Then
 		Assertions.assertNotNull(interviewsResponseDto);
+
+		// List 초기화가 필요
 		List<InterviewsResponseDto.InterviewSessionDto> expectedSessions = expectedResult.getInterviewSessions();
 		List<InterviewsResponseDto.InterviewSessionDto> actualSessions = interviewsResponseDto.getInterviewSessions();
 
+		Assertions.assertNotNull(expectedSessions); // Null 체크 추가
+		Assertions.assertNotNull(actualSessions);   // Null 체크 추가
+
+		// 실제 세션과 기대하는 세션 비교
 		for (int i = 0; i < expectedSessions.size(); i++) {
 			InterviewsResponseDto.InterviewSessionDto expectedSession = expectedSessions.get(i);
 			InterviewsResponseDto.InterviewSessionDto actualSession = actualSessions.get(i);
+			System.out.println("Expected: SessionID: " + expectedSession.getSessionID() + ", Title: " + expectedSession.getTitle());
+			System.out.println("Actual: SessionID: " + actualSession.getSessionID() + ", Title: " + actualSession.getTitle());
+
+			// Assertions을 통해 값 비교
 			Assertions.assertEquals(expectedSession.getSessionID(), actualSession.getSessionID());
 			Assertions.assertEquals(expectedSession.getTitle(), actualSession.getTitle());
 		}
