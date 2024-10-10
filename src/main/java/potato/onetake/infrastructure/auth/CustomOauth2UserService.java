@@ -1,7 +1,9 @@
 package potato.onetake.infrastructure.auth;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Collections;
+import java.util.Map;
+import java.util.UUID;
+
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -9,12 +11,11 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import potato.onetake.domain.member.dao.MemberRepository;
 import potato.onetake.domain.member.domain.Member;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,7 +24,6 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
 
 	private final AuthRepository authRepository;
 	private final MemberRepository memberRepository;
-
 
 	@Override
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -48,37 +48,36 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
 			throw new OAuth2AuthenticationException("Failed to extract OAuthAttributes");
 		}
 
-
 		// Auth와 Member 엔티티 생성 또는 업데이트
-		 Auth auth = saveOrUpdate(extractAttributes);
-		 String uuid = auth.getUuid();
-
+		Member member = saveOrUpdate(extractAttributes);
+		String uuid = member.getUuid();
 
 		// SecurityContext에 저장될 객체 반환
-		return new CustomOauth2User (
+		return new CustomOauth2User(
 			Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
 			attributes,
 			userNameAttributeName,
 			uuid);
 	}
 
-
-	private Auth saveOrUpdate(OAuthAttributes attributes) {
+	private Member saveOrUpdate(OAuthAttributes attributes) {
 		Auth auth = authRepository.findByProviderAndProviderId(attributes.getProvider(), attributes.getProviderId())
-			.orElseGet(() -> new Auth(attributes.getProvider(), attributes.getProviderId(), UUID.randomUUID().toString()));
+			.orElseGet(() -> new Auth(attributes.getProvider(), attributes.getProviderId()));
 
-		Member member = auth.getMember();
-		if (member == null) {
-			member = new Member();
-			auth.setMember(member);
-			member.getAuths().add(auth);
-			memberRepository.save(member);
+		if (auth.getMember() != null) {
+			return auth.getMember();
 		}
+
+		Member member = new Member();
+
+		member.setUuid(UUID.randomUUID().toString());
+		auth.setMember(member);
+		member.getAuths().add(auth);
+		memberRepository.save(member);
 
 		authRepository.save(auth);
 
-		return auth;
+		return member;
 	}
-
 
 }
