@@ -1,6 +1,13 @@
 package potato.onetake.infrastructure.auth;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,16 +30,12 @@ public class Auth {
 	@Column(name = "provider_id", length = 50, nullable = false)
 	private String providerId;
 
-	@Column(name = "uuid", length = 50, nullable = false)
-	private String uuid;
-
 	@ManyToOne
 	@JoinColumn(name = "member_id")
 	private Member member;
 
-	public Auth(String provider, String providerId, String uuid) {
+	public Auth(String provider, String providerId) {
 		this.provider = provider;
 		this.providerId = providerId;
-		this.uuid = uuid;
 	}
 }
