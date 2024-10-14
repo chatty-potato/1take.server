@@ -1,6 +1,7 @@
 package potato.onetake.infrastructure.jwt;
 
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +14,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +46,7 @@ public class JwtTokenProvider {
 			.setClaims(claims)
 			.setIssuedAt(now)
 			.setExpiration(validity)
-			.signWith(getSigningKey(), SignatureAlgorithm.HS256)
+			.signWith(generateSecretKey(secretKey), SignatureAlgorithm.HS256)
 			.compact();
 	}
 
@@ -60,7 +60,7 @@ public class JwtTokenProvider {
 			.setClaims(claims)
 			.setIssuedAt(now)
 			.setExpiration(validity)
-			.signWith(getSigningKey(), SignatureAlgorithm.HS256)
+			.signWith(generateSecretKey(secretKey), SignatureAlgorithm.HS256)
 			.compact();
 	}
 
@@ -74,7 +74,7 @@ public class JwtTokenProvider {
 	// JWT에서 UUID 추출
 	public String getUuidFromToken(String token) {
 		return Jwts.parserBuilder()
-			.setSigningKey(getSigningKey())
+			.setSigningKey(generateSecretKey(secretKey))
 			.build()
 			.parseClaimsJws(token)
 			.getBody()
@@ -84,7 +84,7 @@ public class JwtTokenProvider {
 	public boolean validateToken(String token) {
 		try {
 			Jwts.parserBuilder()
-				.setSigningKey(getSigningKey())
+				.setSigningKey(generateSecretKey(secretKey))
 				.build().parseClaimsJws(token);
 
 			return true;
@@ -94,9 +94,9 @@ public class JwtTokenProvider {
 		}
 	}
 
-	private Key getSigningKey() {
-		byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-		return Keys.hmacShaKeyFor(keyBytes);
+	private Key generateSecretKey(final String secretCode) {
+		final String encodedSecretCode = Base64.getEncoder().encodeToString(secretCode.getBytes());
+		return Keys.hmacShaKeyFor(encodedSecretCode.getBytes());
 	}
 
 	public long getAccessTokenValidity() {
