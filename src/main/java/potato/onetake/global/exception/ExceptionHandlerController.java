@@ -5,8 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
 import potato.onetake.domain.Ineterview.exception.InterviewException;
 import potato.onetake.global.exception.httpException.HttpErrorException;
+import potato.onetake.infrastructure.jwt.exception.JwtException;
 
 /**
  * INTERVIEW_NOT_FOUND(2000,"인터뷰 세션을 찾지 못했습니다."),
@@ -43,6 +45,21 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
 	public ResponseEntity<String> handleInvalidCategoryException(final CustomException e) {
 		return ResponseEntity
 			.status(HttpStatus.BAD_REQUEST)
+			.body(e.toString());
+	}
+
+	@ExceptionHandler({
+		JwtException.InvalidJwtToken.class,
+		JwtException.WrongSignedJwtToken.class,
+		JwtException.ExpiredJwtToken.class,
+		JwtException.UnsupportedJwtToken.class,
+		JwtException.IllegalJwtToken.class,
+		JwtException.UnMatchedTypeJwtToken.class,
+		JwtException.NotFoundJwtToken.class,
+	})
+	public ResponseEntity<String> handleJwtException(final CustomException e) {
+		return ResponseEntity
+			.status(HttpStatus.UNAUTHORIZED)
 			.body(e.toString());
 	}
 }
