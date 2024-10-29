@@ -24,6 +24,7 @@ import potato.onetake.domain.Position.domain.Profile;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,72 +39,62 @@ public class InterviewService {
 	private final InterviewCategoryRepository interviewCategoryRepository;
 	private final QuestionCategoryRepository questionCategoryRepository;
 
-	/**
-	 * createInterview 메서드
-	 * 인터뷰 세션을 생성하고, 사용자의 프로필과 선택된 카테고리 기반으로 인터뷰를 구성합니다.
-	 *
-	 * @param interviewBeginRequestDto 사용자로부터 받은 인터뷰 시작 요청 정보
-	 *  - 사용자 프로필을 조회하고, 선택된 카테고리로 인터뷰를 생성
-	 *  - 각 카테고리에 대해 InterviewCategory 및 InterviewQna를 생성
-	 *
-	 * 처리 단계:
-	 * 1. 시큐리티 컨텍스트에서 로그인된 사용자 ID를 가져옵니다.
-	 * 2. 사용자 프로필을 조회하고, 프로필이 없으면 예외를 던집니다.
-	 * 3. 주어진 제목으로 인터뷰 세션을 생성하고 저장합니다.
-	 * 4. 사용자가 선택한 카테고리로 InterviewCategory를 생성하여 저장합니다.
-	 * 5. 각 카테고리에 속한 질문들로 InterviewQna를 생성하여 인터뷰와 연결합니다.
-	 *
-	 * @return InterviewBeginResponseDto - 생성된 인터뷰 세션 ID를 포함한 응답 DTO를 반환
-	 */
-	@Transactional
-	public InterviewBeginResponseDto createInterview(final InterviewBeginRequestDto interviewBeginRequestDto) {
-
+	private String getUserIdFromSecurityContext() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String userId;
+
 		try {
-			userId = authentication.getName(); // 추후 시큐리티 완성 후 맞게 수정 필요
+			return authentication.getName(); // 추후 시큐리티 완성 후 맞게 수정 필요
 		} catch (NumberFormatException e) {
 			throw new InterviewException.ProfileNotFoundException(); // userId를 찾지 못했을 때 예외 발생
 		}
-
-		final Profile profile = profileRepository.findByAlias(userId)
-			.orElseThrow(InterviewException.ProfileNotFoundException::new);
-
-		Interview interview = new Interview(profile, interviewBeginRequestDto.getTitle());
-		interviewRepository.save(interview);
-
-		List<Long> categoryIdList = new ArrayList<Long>();
-		interviewBeginRequestDto.getCategories().stream()
-			.map(categoryName -> categoryRepository.findByContent(categoryName)
-				.orElseThrow(InterviewException.CategoryNotFoundException::new)) // 카테고리를 찾지 못했을 때 예외 발생
-			.forEach(category -> {
-				createInterviewCategory(interview, category);
-				categoryIdList.add(category.getId());
-			});
-
-		Map<Long, Integer> categoryIdAndNumList = distributeQuestions(10, categoryIdList);
-		createInterviewQna(interview, categoryIdAndNumList);
-		return new InterviewBeginResponseDto(interview.getId());
 	}
 
-	/**
-	 * createInterviewQna 메서드
-	 * 인터뷰에 질문을 분배하고, 각 질문에 대한 InterviewQna를 생성합니다.
-	 *
-	 * @param interview 생성된 인터뷰 객체
-	 * @param categoryIdAndNumList 선택된 카테고리의 ID와 카테고리 별 질문 개수 리스트
-	 *
-	 * 처리 단계:
-	 * 1. 각 카테고리에 대해 분배할 질문 수를 계산합니다.
-	 * 2. 각 카테고리에 대해 랜덤으로 질문을 선택하여 InterviewQna를 생성합니다.
-	 * 3. 생성된 InterviewQna를 저장합니다.
-	 *
-	 * 예외 처리:
-	 *  - 질문 목록이 비어있거나, 질문 개수가 부족할 경우 InvalidCategoryException 예외 발생
-	 */
+	private Profile getProfileByUserId(String userId) {
+		return profileRepository.findByAlias(userId)
+			.orElseThrow(InterviewException.ProfileNotFoundException::new);
+	}
+
 	@Transactional
-	public List<InterviewQna> createInterviewQna(final Interview interview,
-												 final Map<Long, Integer> categoryIdAndNumList) {
+	public Interview createInterview(String interviewTitle) {
+
+		String userId = getUserIdFromSecurityContext();
+		Profile profile = getProfileByUserId(userId);
+
+		Interview interview = Interview.builder()
+			.profile(profile)
+			.title(interviewTitle)
+			.done(false)
+			.build();
+
+		interviewRepository.save(interview);
+
+		return interview;
+	}
+
+	public List<Long> createInterviewCategories(Long interviewId, List<String> categoryNames) {
+		Interview interview = interviewRepository.findById(interviewId)
+			.orElseThrow(InterviewException.InterviewNotFoundException::new);
+
+		return categoryNames.stream()
+			.map(categoryName -> categoryRepository.findByContent(categoryName)
+				.orElseThrow(InterviewException.CategoryNotFoundException::new))
+			.map(category -> {
+				InterviewCategory interviewCategory = createInterviewCategory(interview, category);
+				return interviewCategory.getCategory().getId();})
+			.collect(Collectors.toList());
+	}
+
+	public void createInterviewQuestions(Long interviewId, List<Long> categoryIds) {
+		Interview interview = interviewRepository.findById(interviewId)
+			.orElseThrow(InterviewException.InterviewNotFoundException::new);
+		Map<Long, Integer> categoryIdAndNumList = distributeQuestions(10, categoryIds);
+
+		List<QuestionCategory> questionCategoryList = createQuestionCategoryList(categoryIdAndNumList);
+
+		createInterviewQna(interview, questionCategoryList);
+	}
+
+	public List<QuestionCategory> createQuestionCategoryList(final Map<Long, Integer> categoryIdAndNumList) {
 		final List<QuestionCategory> questionCategoryResultList =
 			questionCategoryRepository.findRandByCategoryIdList(categoryIdAndNumList);
 
@@ -111,10 +102,21 @@ public class InterviewService {
 			throw new InterviewException.InvalidCategoryException();
 		} // 완성된 qna 수가 10개 미만이거나 비었을 경우 exception 던짐
 
+		return questionCategoryResultList;
+	}
+
+	@Transactional
+	public List<InterviewQna> createInterviewQna(final Interview interview,
+												 final List<QuestionCategory> questionCategoryList) {
+
 		List<InterviewQna> interviewQnaList = new ArrayList<>();
 
-		questionCategoryResultList.forEach(questionCategory ->
-			interviewQnaList.add(new InterviewQna(interview, questionCategory)));
+		questionCategoryList.forEach(questionCategory ->
+			interviewQnaList.add(
+				InterviewQna.builder()
+				.interview(interview)
+				.questionCategory(questionCategory)
+				.build()));
 
 		interviewQnaRepository.saveAll(interviewQnaList);
 
@@ -141,38 +143,30 @@ public class InterviewService {
 	 * @return InterviewsResponseDto - 조회된 인터뷰 세션 정보를 포함한 응답 DTO
 	 */
 	@Transactional
-	public InterviewsResponseDto getInterviews() {
+	public InterviewsResponseDto findAllInterviews() {
 
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String userId;
-		try {
-			userId = authentication.getName(); // 추후 시큐리티 완성 후 맞게 수정 필요
-		} catch (NumberFormatException e) {
-			throw new InterviewException.ProfileNotFoundException(); // userId를 찾지 못했을 때 예외 발생
-		}
+		String userId = getUserIdFromSecurityContext();
+		Profile profile = getProfileByUserId(userId);
 
-		final Profile profile = profileRepository.findByAlias(userId)
-			.orElseThrow(InterviewException.ProfileNotFoundException::new);
+		Optional<List<Interview>> interviews = interviewRepository.findAllByProfileId(profile.getId());
 
-		Optional<List<Interview>> interviews = interviewRepository.findAllByProfileAlias(profile.getAlias());
-
-		InterviewsResponseDto interviewsResponseDto = new InterviewsResponseDto();
+		List<InterviewsResponseDto.InterviewSessionDto> sessionDtos = new ArrayList<>();
 
 		if (interviews.isPresent()) {
 			List<Interview> interviewList = interviews.get();
-			List<InterviewsResponseDto.InterviewSessionDto> sessionDtos = interviewList.stream()
+			sessionDtos = interviewList.stream()
 				.map(interview -> new InterviewsResponseDto.InterviewSessionDto(
 					interview.getId(),
 					interview.getTitle(),
-					interview.getCreatedAt() != null ? interview.getCreatedAt().toString() : "No Creation Date",
+					interview.getCreatedAt().toString(),
 					0,
 					interview.isDone()
 				)).toList();
-
-			interviewsResponseDto.setInterviewSessions(sessionDtos); // TODO : 리팩토링
 		}
 
-		return interviewsResponseDto;
+		return InterviewsResponseDto.builder()
+			.interviewSessions(sessionDtos)
+			.build();
 	}
 
 	/**
@@ -190,29 +184,34 @@ public class InterviewService {
 	 * @return InterviewAnswerResponseDto - 모든 질문이 완료되었는지 여부를 포함한 응답 DTO
 	 */
 	@Transactional
-	public InterviewAnswerResponseDto getInterviewAnswer(InterviewAnswerRequestDto interviewAnswerRequestDto, Long interviewId){
-		Optional<Interview> interview = interviewRepository.findById(interviewId);
+	public InterviewAnswerResponseDto updateAnswer(InterviewAnswerRequestDto interviewAnswerRequestDto, Long interviewId){
+
+		updateInterviewQnaByAnswer(interviewAnswerRequestDto);
+
+		return InterviewAnswerResponseDto.builder().done(isAllAnswered(interviewId)).build();
+	}
+
+	@Transactional
+	public boolean isAllAnswered(Long interviewId) {
 		boolean allAnswered = false;
+		List<InterviewQna> interviewQnaList = interviewQnaRepository.findAllByInterviewId(interviewId);
+		allAnswered = interviewQnaList.stream().allMatch(qna -> qna.getAnswer() != null);
 
-		if (interview.isPresent()) {
-			Interview interviewEntity = interview.get();
-			Optional<InterviewQna> interviewQna = Optional.ofNullable(interviewQnaRepository
-				.findByInterviewIdAndQuestionCategoryId(
-					interviewId, interviewAnswerRequestDto.getQuestionIndex())
-				.orElseThrow(InterviewException.QuestionNotFoundException::new));
-			interviewQna.ifPresent(qna -> {
-				qna.setAnswer(interviewAnswerRequestDto.getAnswer());
-				interviewQnaRepository.save(qna);
-			});
+		return allAnswered;
+	}
 
-			// 모든 질문이 저장되었는지 홧인
-			List<InterviewQna> interviewQnaList = interviewQnaRepository.findAllByInterviewId(interviewId);
-			allAnswered = interviewQnaList.stream().allMatch(qna -> qna.getAnswer() != null);
-			interviewEntity.setDone(allAnswered);
+	@Transactional
+	public InterviewQna updateInterviewQnaByAnswer (InterviewAnswerRequestDto interviewAnswerRequestDto) {
+		Long qnaId = interviewAnswerRequestDto.getQuestionIndex();
+		String requestedAnswer = interviewAnswerRequestDto.getAnswer();
 
-			interviewRepository.save(interviewEntity);
-		}
-		return new InterviewAnswerResponseDto(allAnswered);
+		InterviewQna interviewQna = interviewQnaRepository
+			.findById(qnaId)
+			.orElseThrow(InterviewException.QuestionNotFoundException::new);
+
+		interviewQna.setAnswer(requestedAnswer);
+		interviewQnaRepository.save(interviewQna);
+		return interviewQna;
 	}
 
 	/**

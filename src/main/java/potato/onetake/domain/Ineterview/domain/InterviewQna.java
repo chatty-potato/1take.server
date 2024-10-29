@@ -1,9 +1,8 @@
 package potato.onetake.domain.Ineterview.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import potato.onetake.domain.Content.domain.Question;
 import potato.onetake.domain.Content.domain.QuestionCategory;
 import potato.onetake.global.BaseEntity.BaseEntity;
@@ -11,7 +10,8 @@ import potato.onetake.global.BaseEntity.BaseEntity;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
+@SuperBuilder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name="interview_qna")
 public class InterviewQna extends BaseEntity {
 
@@ -26,14 +26,4 @@ public class InterviewQna extends BaseEntity {
 	@Column(name = "answer", nullable = true)
 	private String answer;
 
-	public InterviewQna(final Interview interview, final QuestionCategory questionCategory) {
-		this.interview = interview;
-		this.questionCategory = questionCategory;
-	}
-
-	public  InterviewQna(final Interview interview, final QuestionCategory questionCategory, final String answer) {
-		this.interview = interview;
-		this.questionCategory = questionCategory;
-		this.answer = answer;
-	}
 }

@@ -13,6 +13,7 @@ public enum InterviewErrorCode implements ErrorCode {
 	PROFILE_NOT_FOUND(2002, "프로필을 찾지 못했습니다."),
 	QUESTION_NOT_FOUND(2003, "질문을 찾지 못했습니다."),
 	ANSWER_NOT_FOUND(2004, "질문에 대한 답을 찾지 못했습니다."),
+	DUPLICATED_ANSWER(2005, "이미 답변한 질문입니다."),
 	INVALID_CATEGORY(2010, "질문 생성 중 카테고리에 문제가 발생했습니다.");
 
 	private final int errorCode;

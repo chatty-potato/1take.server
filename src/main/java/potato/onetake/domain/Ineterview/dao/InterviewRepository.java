@@ -9,5 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface InterviewRepository extends JpaRepository<Interview, Long> {
-	Optional<List<Interview>> findAllByProfileAlias(String profileAlias);
+	Optional<List<Interview>> findAllByProfileId(Long profileId);
 }
