@@ -39,6 +39,13 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
 			.body(e.toString());
 	}
 
+	@ExceptionHandler(InterviewException.DuplicateQuestionException.class)
+	public ResponseEntity<String> handleDuplicateQuestionException(final CustomException e) {
+		return ResponseEntity
+			.status(HttpStatus.BAD_REQUEST)
+			.body(e.toString());
+	}
+
 	@ExceptionHandler(InterviewException.InvalidCategoryException.class)
 	public ResponseEntity<String> handleInvalidCategoryException(final CustomException e) {
 		return ResponseEntity

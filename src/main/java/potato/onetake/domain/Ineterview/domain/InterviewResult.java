@@ -1,6 +1,7 @@
 package potato.onetake.domain.Ineterview.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import potato.onetake.global.BaseEntity.BaseEntity;
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @Table(name="interview_result")
 public class InterviewResult extends BaseEntity {

@@ -2,6 +2,7 @@ package potato.onetake.domain.Ineterview.dto;
 
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -10,7 +11,7 @@ import java.util.List;
 @Setter
 @Builder
 public class InterviewQuestionResponseDto {
-	private List<QuestionDto> questions;
+	private List<QuestionDto> questions = new ArrayList<>();
 
 	public void addQuestion(QuestionDto question) {
 		questions.add(question);

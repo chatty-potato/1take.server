@@ -1,9 +1,8 @@
 package potato.onetake.domain.Ineterview.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import potato.onetake.domain.Position.domain.Profile;
 import potato.onetake.global.BaseEntity.BaseEntity;
 
@@ -12,7 +11,8 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
+@SuperBuilder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name="interview")
 public class Interview extends BaseEntity {
 
@@ -26,15 +26,4 @@ public class Interview extends BaseEntity {
 	@Column(name = "done", nullable = false)
 	private boolean done;
 
-	public Interview(Profile profile, String title) {
-		this.profile = profile;
-		this.title = title;
-		this.done = false;
-	}
-
-	public Interview(Profile profile, String title, boolean done) {
-		this.profile = profile;
-		this.title = title;
-		this.done = done;
-	}
 }

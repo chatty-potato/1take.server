@@ -5,16 +5,17 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import potato.onetake.domain.Content.domain.Category;
 import potato.onetake.global.BaseEntity.BaseEntity;
 
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
+@SuperBuilder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Table(name="interview_category")
 public class InterviewCategory extends BaseEntity {
 
@@ -25,10 +26,5 @@ public class InterviewCategory extends BaseEntity {
 	@ManyToOne()
 	@JoinColumn(name = "category_id", referencedColumnName = "id")
 	private Category category;
-
-	public InterviewCategory(final Interview interview, final Category category) {
-		this.interview = interview;
-		this.category = category;
-	}
 
 }

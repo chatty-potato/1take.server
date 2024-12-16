@@ -3,6 +3,7 @@ package potato.onetake.domain.Ineterview.api;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import potato.onetake.domain.Ineterview.domain.Interview;
 import potato.onetake.domain.Ineterview.dto.*;
 import potato.onetake.domain.Ineterview.service.InterviewService;
 
@@ -15,13 +16,14 @@ public class interviewController {
 
 	@GetMapping("/")
 	public ResponseEntity<InterviewsResponseDto> findAllInterviews() {
-		InterviewsResponseDto interviewsResponseDto = interviewService.getInterviews();
+		InterviewsResponseDto interviewsResponseDto = interviewService.findAllInterviews();
 		return ResponseEntity.ok(interviewsResponseDto);
 	}
 
 	@PostMapping("/")
 	public ResponseEntity<InterviewBeginResponseDto> createInterviewSession(InterviewBeginRequestDto requestDto) {
-		InterviewBeginResponseDto interviewBeginResponseDto = interviewService.createInterview(requestDto);
+		Interview interview = interviewService.createInterview(requestDto.getTitle());
+		InterviewBeginResponseDto interviewBeginResponseDto = new InterviewBeginResponseDto();
 		return ResponseEntity.ok(interviewBeginResponseDto);
 	}
 
@@ -37,7 +39,7 @@ public class interviewController {
 		InterviewAnswerRequestDto  interviewAnswerRequestDto, @PathVariable String sessionID) {
 		Long interviewId = Long.parseLong(sessionID);
 		InterviewAnswerResponseDto interviewAnswer =
-			interviewService.getInterviewAnswer(interviewAnswerRequestDto, interviewId);
+			interviewService.updateAnswer(interviewAnswerRequestDto, interviewId);
 		return ResponseEntity.ok(interviewAnswer);
 	}
 

@@ -35,7 +35,8 @@ public class InterviewEntityTest {
 		when(mockProfile.getId()).thenReturn(1L);
 
 		// Given
-		Interview interview = new Interview(mockProfile, "interview title");
+		Interview interview = Interview.builder().profile(mockProfile).title("interview title").build();
+//		Interview interview = new Interview(mockProfile, "interview title");
 		entityManager.persist(interview);
 
 		System.out.printf("interview title: %s\n", interview.getTitle());

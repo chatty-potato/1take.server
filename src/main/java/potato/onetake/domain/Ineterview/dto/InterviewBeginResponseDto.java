@@ -1,13 +1,11 @@
 package potato.onetake.domain.Ineterview.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Setter
 public class InterviewBeginResponseDto {
 	private Long sessionID;
